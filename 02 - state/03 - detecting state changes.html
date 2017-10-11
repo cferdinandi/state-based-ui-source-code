@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+		<title>Web Apps</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<!-- Styles -->
+		<style type="text/css">
+			body {
+				font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+				font-size: 112.5%;
+				max-width: 40em;
+				width: 88%;
+				margin-left: auto;
+				margin-right: auto;
+			}
+		</style>
+	</head>
+
+	<body>
+
+		<div id="app"></div>
+
+
+		<!-- Scripts -->
+		<script>
+
+			/**
+			 * Render a template into the DOM
+			 * @param  {String|Function} template The template to render
+			 * @param  {String|Node}     elem     The element to render into
+			 * @return {[type]}                   The element
+			 */
+			var render = function (template, elem) {
+
+				// Set rendering element for the component
+				if (typeof template === 'function') {
+					template.elem = elem;
+				}
+
+				// If elem is an element, use it.
+				// If it's a selector, get it.
+				elem = typeof elem === 'string' ? document.querySelector(elem) : elem;
+				if (!elem) return;
+
+				// Get the template
+				template = (typeof template === 'function' ? template(template.state) : template);
+				if (typeof template !== 'string') return;
+
+				// Render the template into the element
+				if (elem.innerHTML === template) return;
+				elem.innerHTML = template;
+
+				// Dispatch a render event
+				if (typeof window.CustomEvent === 'function') {
+					var event = new CustomEvent('render', {
+						bubbles: true
+					});
+					elem.dispatchEvent(event);
+				}
+
+				// Return the elem for use elsewhere
+				return elem;
+
+			};
+
+			/**
+			 * Create a component
+			 * @param  {Function}       template  The template function
+			 * @param  {Object}         props     The state data
+			 * @param  {String|Element} elem      The element to render content into
+			 * @return {Function}                 The template function
+			 */
+			var component = function (template, props, elem) {
+
+				Object.defineProperties(template, {
+					elem: {
+						value: elem,
+						writable: true
+					},
+					state: {
+						value: props,
+						writable: true
+					},
+					setState: {
+						value: function (props) {
+
+							// Shallow merge new properties into state object
+							for (var key in props) {
+								if (props.hasOwnProperty(key)) {
+									template.state[key] = props[key];
+								}
+							}
+
+							// Render the element
+							render(template, template.elem);
+
+							// Return the elem for use elsewhere
+							return template.elem;
+
+						}
+					}
+				});
+
+				// Return the elem for use elsewhere
+				return template;
+
+			};
+
+			// Create your component
+			var template = component(function (props) {
+				return '<h1>' + props.greeting + ', world!</h1>';
+			}, {
+				greeting: 'Hello'
+			});
+
+			// Render your component
+			// It will use `#app` as your element selector going forward
+			render(template, '#app');
+
+			// Update 2 seconds later
+			window.setTimeout(function () {
+				// Change the greeting to "Bonjour" and re-render the template
+				template.setState({greeting: 'Bonjour'});
+			}, 5000);
+
+			// Update 3 seconds after that
+			window.setTimeout(function () {
+				// Change the greeting to "Hola" and re-render the template
+				template.setState({greeting: 'Hola'})
+			}, 10000);
+
+		</script>
+	</body>
+</html>

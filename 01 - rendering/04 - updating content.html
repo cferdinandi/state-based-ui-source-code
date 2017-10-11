@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+		<title>Web Apps</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<!-- Styles -->
+		<style type="text/css">
+			body {
+				font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+				font-size: 112.5%;
+				max-width: 40em;
+				width: 88%;
+				margin-left: auto;
+				margin-right: auto;
+			}
+		</style>
+	</head>
+
+	<body>
+
+		<div id="app"></div>
+
+
+		<!-- Scripts -->
+		<script>
+
+			/**
+			 * Render a template into the DOM
+			 * @param  {String|Function} template The template to render
+			 * @param  {String|Node}     elem     The element to render into
+			 * @return {[type]}                   The element
+			 */
+			var render = function (template, elem) {
+
+				// Set rendering element for the component
+				if (typeof template === 'function') {
+					template.elem = elem;
+				}
+
+				// If elem is an element, use it.
+				// If it's a selector, get it.
+				elem = typeof elem === 'string' ? document.querySelector(elem) : elem;
+				if (!elem) return;
+
+				// Get the template
+				template = (typeof template === 'function' ? template(template.state) : template);
+				if (typeof template !== 'string') return;
+
+				// Render the template into the element
+				if (elem.innerHTML === template) return;
+				elem.innerHTML = template;
+
+				// Dispatch a render event
+				if (typeof window.CustomEvent === 'function') {
+					var event = new CustomEvent('render', {
+						bubbles: true
+					});
+					elem.dispatchEvent(event);
+				}
+
+				// Return the elem for use elsewhere
+				return elem;
+
+			};
+
+			// Initial render
+			render('<h1>Hello, world!</h1>', '#app');
+
+			// Update 3 seconds later
+			window.setTimeout(function () {
+				render('<h1>Bonjour, world!</h1>', '#app');
+			}, 3000);
+
+			// Update 3 seconds after that
+			window.setTimeout(function () {
+				render('<h1>Hola, world!</h1>', '#app');
+			}, 6000);
+
+		</script>
+	</body>
+</html>

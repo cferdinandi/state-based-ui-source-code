@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+		<title>Vanilla JS Web Apps</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<!-- Styles -->
+		<style type="text/css">
+			body {
+				font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+				font-size: 112.5%;
+				max-width: 40em;
+				width: 88%;
+				margin-left: auto;
+				margin-right: auto;
+			}
+
+			label {
+				display: block;
+				font-weight: bold;
+			}
+
+			.text-small {
+				font-size: 0.7em;
+			}
+		</style>
+	</head>
+
+	<body>
+
+		<div id="app"></div>
+
+
+		<!-- Scripts -->
+		<script>
+			var pattern = '/books/(:name)/(:title)';
+			var url = '/books/chris-ferdinandi/dom-manipulation/';
+
+			// @todo incorporate into router() method
+			// 	- Add mode (URL vs. query)
+			// 	- Add method
+
+			/**
+			 * Parse a URL pathname for variables
+			 * @param  {String} pattern The pattern to match
+			 * @param  {String} url     The pathname to parse
+			 * @return {Object}         Details from the pathname
+			 */
+			var parsePathname = function (pattern, url) {
+
+				// Variables
+				var map = {};
+				var keys = [];
+				var matches = false;
+
+				// If the URL is an exact match for the pattern, return it
+				if ([url, url + '/'].indexOf(pattern) !== -1) {
+					return {
+						id: pattern,
+						params: {},
+						url: url
+					};
+				}
+
+				// Add a trailing slash to the URL if one is missing
+				url = url.slice(-1) === '/' ? url : url + '/';
+
+				// Push variables in the pattern to our key array and replace them with regex match grouping
+				var newPattern = pattern.replace('(*)', '.+?').replace(/\(:.+?\)/g, function(match) {
+					var key = match.slice(2, -1);
+					keys.push(key);
+					return '([^/]*)';
+				});
+
+				// Test the URL against the pattern.
+				// If it's a match, pull the variables out into the map
+				var test = url.replace(new RegExp('^' + newPattern + '/$'), function() {
+					matches = true;
+					for (var i = 0; i < keys.length; i++) {
+						map[keys[i]] = arguments[i+1];
+					}
+				});
+
+				// Return the data
+				return {
+					id: (matches ? pattern : null),
+					params: map,
+					url: url
+				};
+			};
+
+			console.group(url);
+				console.log(parser(pattern, url));
+			console.groupEnd();
+
+			console.group(url + 'random-thing');
+				console.log(parser(pattern, url + 'random-thing'));
+			console.groupEnd();
+
+			console.group(url + 'random-thing/more-random');
+				console.log(parser(pattern, url + 'random-thing/more-random'));
+			console.groupEnd();
+
+			console.group('/books/chris-ferdinandi/chicken-marsala/dom-manipulation/');
+				console.log(parser(pattern, '/books/chris-ferdinandi/chicken-marsala/dom-manipulation/'));
+			console.groupEnd();
+
+			console.group('No Pattern');
+				console.log(parser(url, url));
+			console.groupEnd();
+
+			console.group('No Pattern, No Match');
+				console.log(parser(url, url + 'random-thing'));
+			console.groupEnd();
+
+
+			// function isPage(page) {
+			//   return page.route === 'home';
+			// }
+
+			// var routes = [
+			// 	{
+			// 		route: 'settings',
+			// 		title: 'Settings | '
+			// 	},
+			// 	{
+			// 		route: 'home',
+			// 		title: ''
+			// 	},
+			// 	{
+			// 		route: '',
+			// 		redirect: '?p=home'
+			// 	},
+			// ];
+
+			// var routes = {
+			// 	'/books': {
+			// 		id: 'books',
+			// 		title: 'Books | '
+			// 	},
+			// 	'/books/(:name)': {
+			// 		id: 'booksAuthor',
+			// 		title: 'Book Author | '
+			// 	},
+			// 	'/books/(:name)/(:title)': {
+			// 		id: 'bookTitle',
+			// 		title: 'Book Title | '
+			// 	}
+			// };
+
+			// routes.find(isPage);
+		</script>
+	</body>
+</html>

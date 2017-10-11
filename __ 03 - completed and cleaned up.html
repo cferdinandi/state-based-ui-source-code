@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+		<title>Web Apps with Vanilla JS</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<!-- Styles -->
+		<style type="text/css">
+			body {
+				font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+				font-size: 112.5%;
+				max-width: 40em;
+				width: 88%;
+				margin-left: auto;
+				margin-right: auto;
+			}
+
+			label {
+				display: block;
+				font-weight: bold;
+				margin-bottom: 0.5em;
+			}
+
+			.text-small {
+				font-size: 0.7em;
+			}
+		</style>
+	</head>
+
+	<body>
+
+		<div id="app"></div>
+
+
+		<!-- Scripts -->
+		<script>
+
+			//
+			// Methods
+			//
+
+			/**
+			 * Render a template into the DOM
+			 * @param  {String|Function} template The template to render
+			 * @param  {String|Node}     elem     [description]
+			 * @return {[type]}          [description]
+			 */
+			var render = function (template, elem) {
+
+				// Set rendering element for the component
+				if (typeof template === 'function') {
+					template.elem = elem;
+				}
+
+				// If elem is an element, use it.
+				// If it's a selector, get it.
+				elem = typeof elem === 'string' ? document.querySelector(elem) : elem;
+				if (!elem) return;
+
+				// Get the template
+				template = (typeof template === 'function' ? template(template.state) : template);
+				if (typeof template !== 'string') return;
+
+				// Render the template into the element
+				if (elem.innerHTML === template) return;
+				elem.innerHTML = template;
+
+				// Dispatch a render event
+				if (typeof window.CustomEvent === 'function') {
+					var event = new CustomEvent('render', {
+						bubbles: true
+					});
+					elem.dispatchEvent(event);
+				}
+
+				// Return the elem for use elsewhere
+				return elem;
+
+			};
+
+			/**
+			 * Create a component
+			 * @param  {Function}       template  The template function
+			 * @param  {Object}         props     The state data
+			 * @param  {String|Element} elem      The element to render content into
+			 * @return {Function}                 The template function
+			 */
+			var component = function (template, props, elem) {
+
+				Object.defineProperties(template, {
+					elem: {
+						value: elem,
+						writable: true
+					},
+					state: {
+						value: props,
+						writable: true
+					},
+					setState: {
+						value: function (props) {
+
+							// Shallow merge new properties into state object
+							for (var key in props) {
+								if (props.hasOwnProperty(key)) {
+									template.state[key] = props[key];
+								}
+							}
+
+							// Render the element
+							render(template, template.elem);
+
+							// Return the elem for use elsewhere
+							return template.elem;
+
+						}
+					}
+				});
+
+				// Return the elem for use elsewhere
+				return template;
+
+			};
+
+			/**
+			 * Setup URL router
+			 * @param  {Object} routes  The URL paths
+			 * @param  {Object} options Custom options
+			 * @return {Object}         The routes
+			 */
+			var router = function (routes, options) {
+
+				// Defaults
+				var settings = {
+					selector: '[data-route]',
+					ignore: '[data-route-ignore]',
+					key: 'p', // The query string key to use
+					title: '',
+					onpopstate: true,
+					forceReload: !(history.pushState),
+					type: 'query' // valid: query|path
+				};
+
+				// Shallow merge new properties into settings object
+				for (var key in options) {
+					if (options.hasOwnProperty(key)) {
+						settings[key] = options[key];
+					}
+				}
+
+				/**
+				 * Get the URL parameters
+				 * source: https://css-tricks.com/snippets/javascript/get-url-variables/
+				 * @param  {String} url The URL
+				 * @return {Object}     The URL parameters
+				 */
+				var getParams = function (url) {
+					var params = {};
+					var parser = document.createElement('a');
+					parser.href = url;
+					var query = parser.search.substring(1);
+					var vars = query.split('&');
+					for (var i=0; i < vars.length; i++) {
+						var pair = vars[i].split("=");
+						params[pair[0]] = decodeURIComponent(pair[1]);
+					}
+					return params;
+				};
+
+				/**
+				 * Parse a URL pathname for variables
+				 * @param  {String} pattern The pattern to match
+				 * @param  {String} url     The pathname to parse
+				 * @return {Object}         Details from the pathname
+				 */
+				var parsePathname = function (pattern, url) {
+
+					// Variables
+					var map = {};
+					var keys = [];
+					var matches = false;
+
+					// If the URL is an exact match for the pattern, return it
+					if (url === pattern || url + '/' === pattern) {
+						return {
+							id: pattern,
+							params: {},
+							url: url
+						};
+					}
+
+					// Add a trailing slash to the URL if one is missing
+					url = url.slice(-1) === '/' ? url : url + '/';
+
+					// Push variables in the pattern to our key array and replace them with regex match grouping
+					var newPattern = pattern.replace('(*)', '.+?').replace(/\(:.+?\)/g, function(match) {
+						var key = match.slice(2, -1);
+						keys.push(key);
+						return '([^/]*)';
+					});
+
+					// Test the URL against the pattern.
+					// If it's a match, pull the variables out into the map
+					var test = url.replace(new RegExp('^' + newPattern + '/$'), function() {
+						matches = true;
+						for (var i = 0; i < keys.length; i++) {
+							map[keys[i]] = arguments[i+1];
+						}
+					});
+
+					// Return the data
+					return {
+						id: (matches ? pattern : null),
+						params: map,
+						url: url
+					};
+				};
+
+				/**
+				 * Get the route state from query strings
+				 * @param  {String} url The URL
+				 * @return {Object}     The route state
+				 */
+				var getRouteFromQuery = function (url) {
+
+					// Get the query string parameters and the page id
+					var params = getParams(url);
+					var id = params[settings.key] ? params[settings.key] : '';
+
+					// If route has redirect, call setRoute with redirect URL
+					if (routes[id] && routes[id].redirect) {
+						routes.setRoute(routes[id].redirect);
+						return;
+					}
+
+					return {
+						id: routes[id] ? id : 404,
+						params: params,
+						url: url
+					};
+				};
+
+				/**
+				 * Get a route state from a pathname
+				 * @param  {String} url The URL
+				 * @return {Object}     The route state
+				 */
+				var getRouteFromPath = function (url) {
+
+					// Loop through each route and test against URL
+					for (var route in routes) {
+						if (routes.hasOwnProperty(route)) {
+							var parsed = parsePathname(route, url);
+							if (parsed.id) {
+								return parsed;
+							}
+						}
+					}
+
+					// Otherwise return 404
+					return {
+						id: 404,
+						params: {},
+						url: url
+					};
+
+				};
+
+				/**
+				 * Setup the route properties
+				 */
+				Object.defineProperties(routes, {
+					state: {
+						value: {
+							id: '',
+							params: {},
+							url: null
+						}
+					},
+					setRoute: {
+						value: function (url) {
+
+							// Bail if there's no URL
+							if (!url) return;
+
+							// Get the route state
+							var state;
+							if (settings.type === 'path') {
+								state = getRouteFromPath(url);
+								if (!state) return;
+								routes.state.id = state.id;
+								routes.state.params = state.params;
+								routes.state.url = state.url;
+							} else {
+								state = getRouteFromQuery(url);
+								if (!state) return;
+								routes.state.id = state.id;
+								routes.state.params = state.params;
+								routes.state.url = state.url;
+							}
+
+							return routes.state;
+						}
+					},
+					push: {
+						value: function () {
+							if (settings.forceReload) {
+								if (window.location.href === routes.state.url) return;
+								window.location.href = routes.state.url;
+							}
+
+							if (!history.pushState) return;
+
+							// Update the page title
+							document.title = (routes[routes.state.id] && routes[routes.state.id].title ? routes[routes.state.id].title : '') + settings.title;
+
+							// Don't run if already current page
+							if (history.state && history.state.url && history.state.url === routes.state.url) return;
+							history.pushState(
+								routes.state,
+								(routes[routes.state.id] && routes[routes.state.id].title ? routes[routes.state.id].title : '') + settings.title,
+								routes.state.url
+							);
+						}
+					},
+					replace: {
+						value: function () {
+							if (!history.replaceState) return;
+
+							// Update the page title
+							document.title = (routes[routes.state.id] && routes[routes.state.id].title ? routes[routes.state.id].title : '') + settings.title;
+
+							// Don't run if already current page
+							if (history.state && history.state.url && history.state.url === routes.state.url) return;
+							history.pushState(
+								routes.state,
+								(routes[routes.state.id].title ? routes[routes.state.id].title : '') + settings.title,
+								routes.state.url
+							);
+						}
+					},
+					route: {
+						value: function (url) {
+							if (!url) return;
+							routes.setRoute(url);
+							routes.push();
+							var event = new CustomEvent('route', {
+								bubbles: true,
+								detail: {
+									state: routes.state
+								}
+							});
+							document.dispatchEvent(event);
+							return routes.state;
+						}
+					}
+				});
+
+				/**
+				 * Add event listeners
+				 */
+
+				// Listen for router link clicks
+				window.addEventListener('click', function (event) {
+					if (!event.target.matches(settings.selector) || event.target.matches(settings.ignore)) return;
+					event.preventDefault();
+					routes.route(event.target.href);
+				}, false);
+
+				// Listen for popstate events
+				if (settings.onpopstate) {
+					window.addEventListener('popstate', function (event) {
+						if (!history.state.url) return;
+						routes.route(history.state.url);
+					}, false);
+				}
+
+				return routes;
+
+			};
+
+			/**
+			 * Shuffle an array
+			 * Source: https://www.frankmitchell.org/2015/01/fisher-yates/
+			 * @param  {Array} array The array to shuffle
+			 * @return {*}           The first item in the shuffled array
+			 */
+			var shuffle = function (array) {
+
+				if (array.length < 1) return '';
+
+				// Create a clone of the array so that we don't shuffle the original one
+				var arr = array.slice(0);
+
+				var i = 0;
+				var j = 0;
+				var temp = null;
+
+				for (i = arr.length - 1; i > 0; i -= 1) {
+					j = Math.floor(Math.random() * (i + 1));
+					temp = arr[i];
+					arr[i] = array[j];
+					arr[j] = temp;
+				}
+
+				return arr[0];
+
+			};
+
+			/**
+			 * Get the selected driver
+			 * @return {String} The selected driver
+			 */
+			var getDriver = function (drivers) {
+				return shuffle(drivers);
+			};
+
+
+			//
+			// Components
+			//
+
+			/**
+			 * The app structure
+			 */
+			var app = component(function () {
+				var template;
+				if (routes.state.id === 'settings') {
+					template =
+						'<h1>Settings</h1>' +
+						'<p><a data-route href="?p=home">&larr; Pick who\'s driving</a></p>' +
+						'<div id="settings"></div>';
+				} else {
+					template =
+						'<h1>Who\'s Driving?</h1>' +
+						'<p><a data-route href="?p=settings">Settings &rarr;</a></p>' +
+						'<div id="driver-list"></div>' +
+						'<div id="driver-actions">' +
+							'<form id="add-driver">' +
+								'<label>Type the name of your driver and hit enter</label>' +
+								'<input type="text" name="new-driver" id="new-driver" autofocus>' +
+								'<button class="btn" type="submit">Add Driver</button>' +
+							'</form>' +
+							'<form id="pick-driver"><button class="btn btn-secondary" id="pick-driver-submit">Pick Who Drives</button></form>' +
+						'</div>' +
+						'<div id="selected-driver"></div>';
+				}
+				return template;
+			}, {}, document.querySelector('#app'));
+
+			/**
+			 * The list of potential drivers
+			 */
+			var driverList = component(function (props) {
+				if (routes.state.id !== 'home') return;
+				var template = '';
+				props.drivers.forEach(function (driver) {
+					template +=
+						'<li>' +
+							driver +
+							' <a class="remove-driver text-small" role="button" data-driver="' + driver + '" href="#">remove</a>' +
+						'</li>';
+				});
+				if (template.length < 1) return '';
+				return '<ul>' + template + '</ul>';
+			}, {drivers: []});
+
+			/**
+			 * The selected driver
+			 */
+			var selectedDriver = component(function (props) {
+				if (routes.state.id !== 'home') return;
+				if (!props.selected) return '';
+				return '<p><strong>' + props.selected + '</strong> is driving</p>';
+			}, {
+				selected: null
+			});
+
+			/**
+			 * The settings form
+			 */
+			var settingsForm = component(function (props) {
+				if (routes.state.id !== 'settings') return;
+				var template =
+					'<form id="driver-settings">' +
+						'<button type="submit">Remove All Drivers</button>' +
+					'</form>';
+				return template;
+			}, {});
+
+			/**
+			 * The 404 page
+			 */
+			var fourOhFour = component(function (props) {
+				if (routes.state.id !== 404) return;
+				return '<h1>Uh oh!</h1><p>That page can\'t be found. Sorry!</p>';
+			}, {});
+
+
+			/**
+			 * Create routes for app
+			 */
+			var routes = router({
+				settings: {
+					title: 'Settings | '
+				},
+				home: {
+					title: ''
+				},
+				'': {
+					title: '',
+					redirect: '?p=home'
+				}
+			}, {
+				title: 'Who\'s Driving?'
+			});
+
+
+			//
+			// Render
+			//
+
+			var renderApp = function () {
+				render(app, '#app');
+				render(driverList, '#driver-list');
+				render(selectedDriver, '#selected-driver');
+				render(settingsForm, '#settings');
+				render(fourOhFour, '#app');
+			};
+
+
+			//
+			// Event Listeners
+			//
+
+			// Listen for form submissions
+			window.addEventListener('submit', function (event) {
+
+				// If adding a driver
+				if (event.target.matches('#add-driver')) {
+					event.preventDefault();
+					var driver = event.target.querySelector('#new-driver');
+					if (driver.value.length < 1) return;
+					driverList.state.drivers.push(driver.value.trim());
+					driverList.setState({
+						drivers: driverList.state.drivers
+					});
+					driver.value = '';
+					return;
+				}
+
+				// If picking a driver
+				if (event.target.matches('#pick-driver')) {
+					event.preventDefault();
+					var picked = getDriver(driverList.state.drivers);
+					selectedDriver.setState({
+						selected: picked
+					});
+					return;
+				}
+
+				// Delete all drivers
+				if (event.target.matches('#driver-settings')) {
+					event.preventDefault();
+					driverList.setState({
+						drivers: []
+					});
+					selectedDriver.setState({
+						selected: null
+					});
+					routes.route('?p=home');
+				}
+
+			}, false);
+
+			// Listen for click events
+			window.addEventListener('click', function (event) {
+				if (!event.target.matches('[data-driver]')) return;
+				event.preventDefault();
+				var driver = driverList.state.drivers.indexOf(event.target.getAttribute('data-driver'));
+				driverList.state.drivers.splice(driver, 1);
+				driverList.setState({
+					drivers: driverList.state.drivers
+				});
+			}, false);
+
+			// Listen for route events
+			window.addEventListener('route', function () {
+				renderApp();
+			}, false);
+
+			routes.route(window.location.href);
+
+		</script>
+	</body>
+</html>
