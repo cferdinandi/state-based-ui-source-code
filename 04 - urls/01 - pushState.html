@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+		<title>pushState()</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<!-- Styles -->
+		<style type="text/css">
+			body {
+				font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+				font-size: 112.5%;
+				max-width: 40em;
+				width: 88%;
+				margin-left: auto;
+				margin-right: auto;
+			}
+		</style>
+	</head>
+
+	<body>
+
+		<p><button id="update">Update the URL</button></p>
+
+
+		<!-- Scripts -->
+		<script>
+			document.querySelector('#update').addEventListener('click', function () {
+				history.pushState({
+					id: 'My new page',
+					message: 'You clicked the button!'
+				}, 'The new page title', '#some-hash-value?id=something&message=something%20else');
+
+				console.group('history.state AFTER pushState() is run');
+					console.log(history.state);
+					console.log('Notice that you can now click the back button in the browser.');
+				console.groupEnd();
+			}, false);
+
+			console.group('history.state before pushState() is run');
+				console.log(history.state);
+			console.groupEnd();
+		</script>
+	</body>
+</html>

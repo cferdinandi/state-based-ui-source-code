@@ -3,7 +3,7 @@
 
 	<head>
 		<meta charset="utf-8">
-		<title>Vanilla JS Web Apps</title>
+		<title>Real URLs</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 		<!-- Styles -->
@@ -16,32 +16,16 @@
 				margin-left: auto;
 				margin-right: auto;
 			}
-
-			label {
-				display: block;
-				font-weight: bold;
-			}
-
-			.text-small {
-				font-size: 0.7em;
-			}
 		</style>
 	</head>
 
 	<body>
 
-		<div id="app"></div>
+		<h1>Hello, world.</h1>
 
 
 		<!-- Scripts -->
 		<script>
-			var pattern = '/books/(:name)/(:title)';
-			var url = '/books/chris-ferdinandi/dom-manipulation/';
-
-			// @todo incorporate into router() method
-			// 	- Add mode (URL vs. query)
-			// 	- Add method
-
 			/**
 			 * Parse a URL pathname for variables
 			 * @param  {String} pattern The pattern to match
@@ -56,7 +40,7 @@
 				var matches = false;
 
 				// If the URL is an exact match for the pattern, return it
-				if ([url, url + '/'].indexOf(pattern) !== -1) {
+				if (url === pattern || url + '/' === pattern) {
 					return {
 						id: pattern,
 						params: {},
@@ -91,66 +75,31 @@
 				};
 			};
 
-			console.group(url);
-				console.log(parser(pattern, url));
+			console.group('pattern: /settings');
+				console.log(parsePathname('/settings', '/settings'));
+				console.log(parsePathname('/settings', '/settings/username'));
 			console.groupEnd();
 
-			console.group(url + 'random-thing');
-				console.log(parser(pattern, url + 'random-thing'));
+			console.group('pattern: /settings/username');
+				console.log(parsePathname('/settings/username', '/settings'));
+				console.log(parsePathname('/settings/username', '/settings/username'));
 			console.groupEnd();
 
-			console.group(url + 'random-thing/more-random');
-				console.log(parser(pattern, url + 'random-thing/more-random'));
+			console.group('pattern: /books/(:author)/(:book)');
+				console.log(parsePathname('/books/(:author)/(:book)', '/books/rowling/harry%20potter'));
+				console.log(parsePathname('/books/(:author)/(:book)', '/books/adams/hitchhikers'));
+				console.log(parsePathname('/books/(:author)/(:book)', '/books/adams/hitchhikers/part-2'));
 			console.groupEnd();
 
-			console.group('/books/chris-ferdinandi/chicken-marsala/dom-manipulation/');
-				console.log(parser(pattern, '/books/chris-ferdinandi/chicken-marsala/dom-manipulation/'));
+			console.group('pattern: /publisher/(*)/(:book)');
+				console.log(parsePathname('/publisher/(*)/(:book)', '/publisher/adams/hitchhikers'));
+				console.log(parsePathname('/publisher/(*)/(:book)', '/publisher/1979/hitchhikers'));
+				console.log(parsePathname('/publisher/(*)/(:book)', '/publisher/1979/adams/hitchhikers'));
+
+				// So you can see a challenge with wildcards
+				// This returns the wrong result for (:book)
+				console.log(parsePathname('/publisher/(*)/(:book)', '/publisher/1979/hitchhikers/adams'));
 			console.groupEnd();
-
-			console.group('No Pattern');
-				console.log(parser(url, url));
-			console.groupEnd();
-
-			console.group('No Pattern, No Match');
-				console.log(parser(url, url + 'random-thing'));
-			console.groupEnd();
-
-
-			// function isPage(page) {
-			//   return page.route === 'home';
-			// }
-
-			// var routes = [
-			// 	{
-			// 		route: 'settings',
-			// 		title: 'Settings | '
-			// 	},
-			// 	{
-			// 		route: 'home',
-			// 		title: ''
-			// 	},
-			// 	{
-			// 		route: '',
-			// 		redirect: '?p=home'
-			// 	},
-			// ];
-
-			// var routes = {
-			// 	'/books': {
-			// 		id: 'books',
-			// 		title: 'Books | '
-			// 	},
-			// 	'/books/(:name)': {
-			// 		id: 'booksAuthor',
-			// 		title: 'Book Author | '
-			// 	},
-			// 	'/books/(:name)/(:title)': {
-			// 		id: 'bookTitle',
-			// 		title: 'Book Title | '
-			// 	}
-			// };
-
-			// routes.find(isPage);
 		</script>
 	</body>
 </html>

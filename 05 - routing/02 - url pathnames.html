@@ -3,7 +3,7 @@
 
 	<head>
 		<meta charset="utf-8">
-		<title>Vanilla JS Web Apps</title>
+		<title>Routing with URL Pathnames</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 		<!-- Styles -->
@@ -16,16 +16,6 @@
 				margin-left: auto;
 				margin-right: auto;
 			}
-
-			label {
-				display: block;
-				font-weight: bold;
-				margin-bottom: 0.5em;
-			}
-
-			.text-small {
-				font-size: 0.7em;
-			}
 		</style>
 	</head>
 
@@ -34,18 +24,19 @@
 		<div id="app"></div>
 
 
+
 		<!-- Scripts -->
 		<script>
 
 			//
-			// Methods
+			// Helper Methods
 			//
 
 			/**
 			 * Render a template into the DOM
 			 * @param  {String|Function} template The template to render
-			 * @param  {String|Node}     elem     [description]
-			 * @return {[type]}          [description]
+			 * @param  {String|Node}     elem     The element to render into
+			 * @return {[type]}                   The element
 			 */
 			var render = function (template, elem) {
 
@@ -380,235 +371,50 @@
 
 			};
 
-			/**
-			 * Shuffle an array
-			 * Source: https://www.frankmitchell.org/2015/01/fisher-yates/
-			 * @param  {Array} array The array to shuffle
-			 * @return {*}           The first item in the shuffled array
-			 */
-			var shuffle = function (array) {
-
-				if (array.length < 1) return '';
-
-				// Create a clone of the array so that we don't shuffle the original one
-				var arr = array.slice(0);
-
-				var i = 0;
-				var j = 0;
-				var temp = null;
-
-				for (i = arr.length - 1; i > 0; i -= 1) {
-					j = Math.floor(Math.random() * (i + 1));
-					temp = arr[i];
-					arr[i] = array[j];
-					arr[j] = temp;
-				}
-
-				return arr[0];
-
-			};
-
-			/**
-			 * Get the selected driver
-			 * @return {String} The selected driver
-			 */
-			var getDriver = function (drivers) {
-				return shuffle(drivers);
-			};
-
-			/**
-			 * Save the current driver list
-			 */
-			var saveDrivers = function (drivers) {
-				localStorage.setItem('whosDriving', JSON.stringify(drivers.state));
-			};
-
 
 			//
-			// Components
+			// Setup Our Components
 			//
 
-			/**
-			 * The app structure
-			 * @return {String}  The template
-			 */
-			var app = function () {
-				var template;
-				if (routes.state.id === 'settings') {
-					template =
-						'<h1>Settings</h1>' +
-						'<p><a data-route href="?p=home">&larr; Pick who\'s driving</a></p>' +
-						'<div id="settings"></div>';
-				} else {
-					template =
-						'<h1>Who\'s Driving?</h1>' +
-						'<p><a data-route href="?p=settings">Settings &rarr;</a></p>' +
-						'<div id="driver-list"></div>' +
-						'<div id="driver-actions">' +
-							'<form id="add-driver">' +
-								'<label>Type the name of your driver and hit enter</label>' +
-								'<input type="text" name="new-driver" id="new-driver" autofocus>' +
-								'<button class="btn" type="submit">Add Driver</button>' +
-							'</form>' +
-							'<form id="pick-driver"><button class="btn btn-secondary" id="pick-driver-submit">Pick Who Drives</button></form>' +
-						'</div>' +
-						'<div id="selected-driver"></div>';
-				}
-				return template;
-			};
-			component(app, {}, document.querySelector('#app'));
-
-			/**
-			 * The list of potential drivers
-			 * @param  {Object} props Component state
-			 * @return {String}       The template
-			 */
-			var driverList = function (props) {
-				if (routes.state.id !== 'home') return;
-				var template = '';
-				props.drivers.forEach(function (driver) {
-					template +=
-						'<li>' +
-							driver +
-							(props.selected === driver ? ' <em class="text-small">(drove last)</em>' : '') +
-							' <a class="remove-driver text-small" role="button" data-driver="' + driver + '" href="#">remove</a>' +
-						'</li>';
-				});
-				if (template.length < 1) return '';
-				return '<ul>' + template + '</ul>';
-			};
-			component(driverList, {drivers: []});
-
-			/**
-			 * The selected driver
-			 * @param  {Object} props Component state
-			 * @return {String}       The template
-			 */
-			var selectedDriver = function (props) {
-				if (routes.state.id !== 'home') return;
-				if (!props.selected) return '';
-				return '<p><strong>' + props.selected + '</strong> is driving</p>';
-			};
-			component(selectedDriver, {selected: null});
-
-			/**
-			 * The settings form
-			 * @param  {Object} props Component state
-			 * @return {String}       The template
-			 */
-			var settingsForm = function (props) {
-				if (routes.state.id !== 'settings') return;
-				var template =
-					'<form id="driver-settings">' +
-						'<button type="submit">Remove All Drivers</button>' +
-					'</form>';
-				return template;
-			};
-			component(settingsForm, {});
-
-			/**
-			 * The 404 page
-			 * @param  {Object} props Component state
-			 * @return {String}       The template
-			 */
-			var fourOhFour = function (props) {
-				if (routes.state.id !== 404) return;
-				return '<h1>Uh oh!</h1><p>That page can\'t be found. Sorry!</p>';
-			};
-			component(fourOhFour, {});
-
-
-			/**
-			 * Create routes for app
-			 */
 			var routes = router({
-				settings: {
-					title: 'Settings | '
+				'home': {
+					title: 'Home'
 				},
-				home: {
-					title: ''
+				'settings': {
+					title: 'Settings'
 				},
-				'': {
-					title: '',
-					redirect: '?p=home'
-					// redirect: '/home'
+				'password': {
+					redirect: '/settings'
+				},
+				'/': {
+					redirect: '/home'
 				}
 			}, {
-				title: 'Who\'s Driving?'
+				type: 'path'
 			});
 
+			var app = component(function (props) {
 
-			//
-			// Render
-			//
+				// Create the nav
+				var nav = '<p><a data-route href="/home">Home</a> | <a data-route href="/settings">Settings</a> | <a data-route href="/password">Password (redirects to settings)</a></p>';
 
-			var savedData = localStorage.getItem('whosDriving');
-			if (savedData) {
-				driverList.state = JSON.parse(savedData);
-			}
-			var renderApp = function () {
-				render(app, '#app');
-				render(driverList, '#driver-list');
-				render(selectedDriver, '#selected-driver');
-				render(settingsForm, '#settings');
-				render(fourOhFour, '#app');
-			};
-
-
-			//
-			// Event Listeners
-			//
-
-			// Listen for form submissions
-			window.addEventListener('submit', function (event) {
-
-				// If adding a driver
-				if (event.target.matches('#add-driver')) {
-					event.preventDefault();
-					var driver = event.target.querySelector('#new-driver');
-					if (driver.value.length < 1) return;
-					driverList.state.drivers.push(driver.value.trim());
-					driverList.setState({drivers:driverList.state.drivers});
-					driver.value = '';
-					saveDrivers(driverList);
-					return;
+				// Conditional content depending on our route
+				if (routes.state.id === 'home') {
+					return '<h1>Homepage</h1>' + nav;
+				} else if (routes.state.id === 'settings') {
+					return '<h1>Settings</h1>' + nav;
+				} else {
+					return '<h1>404</h1><p>This will only work if you host this file as the root file on a live domain.</p>' + nav;
 				}
 
-				// If picking a driver
-				if (event.target.matches('#pick-driver')) {
-					event.preventDefault();
-					var picked = getDriver(driverList.state.drivers);
-					selectedDriver.setState({selected: picked});
-					render(driverList, '#driver-list');
-					driverList.state.selected = picked;
-					saveDrivers(driverList);
-					return;
-				}
+			}, {}, '#app');
 
-				// Delete all drivers
-				if (event.target.matches('#driver-settings')) {
-					event.preventDefault();
-					driverList.setState({drivers: []});
-					saveDrivers(driverList);
-					routes.route('?p=home');
-				}
-
-			}, false);
-
-			// Listen for click events
-			window.addEventListener('click', function (event) {
-				if (!event.target.matches('[data-driver]')) return;
-				event.preventDefault();
-				var driver = driverList.state.drivers.indexOf(event.target.getAttribute('data-driver'));
-				driverList.state.drivers.splice(driver, 1);
-				driverList.setState({drivers: driverList.state.drivers});
-				saveDrivers(driverList);
-			}, false);
-
+			// Render app on URL updates
 			window.addEventListener('route', function () {
-				renderApp();
+				render(app, '#app');
 			}, false);
 
+			// Run initial routing
 			routes.route(window.location.href);
 
 		</script>

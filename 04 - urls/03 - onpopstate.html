@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+		<title>onpopstate</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<!-- Styles -->
+		<style type="text/css">
+			body {
+				font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+				font-size: 112.5%;
+				max-width: 40em;
+				width: 88%;
+				margin-left: auto;
+				margin-right: auto;
+			}
+		</style>
+	</head>
+
+	<body>
+
+		<ol>
+			<li><button id="update">Click Me to Update the URL</button></li>
+			<li>Click the back button and look in the Console tab of developer tools.</li>
+			<li>Click the forward button and look again.</li>
+		</ol>
+
+		<p>With each forward and backward click, the <code>onpopstate</code> event will log the <code>history.state</code> in the developer console.</p>
+
+
+		<!-- Scripts -->
+		<script>
+			// Set a default history.state
+			history.replaceState({
+				id: 'The Starting Page',
+				message: 'You did nothing. This is the default.'
+			}, 'onpopstate', window.location.href);
+
+			document.querySelector('#update').addEventListener('click', function () {
+				history.pushState({
+					id: 'My new page',
+					message: 'You clicked the button!'
+				}, 'The new page title', '#some-hash-value?id=something&message=something%20else');
+			}, false);
+
+			window.addEventListener('popstate', function () {
+				console.log(history.state);
+			}, false);
+		</script>
+	</body>
+</html>
