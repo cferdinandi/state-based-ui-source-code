@@ -1,5 +1,6 @@
-/**
+/*!
  * Create a component
+ * (c) 2017 Chris Ferdinandi, MIT License, https://gomakethings.com
  * @param  {Function}       template  The template function
  * @param  {Object}         props     The state data
  * @param  {String|Element} elem      The element to render content into

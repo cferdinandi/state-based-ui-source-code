@@ -1,5 +1,6 @@
-/**
+/*!
  * Setup URL router
+ * (c) 2017 Chris Ferdinandi, MIT License, https://gomakethings.com
  * @param  {Object} routes  The URL paths
  * @param  {Object} options Custom options
  * @return {Object}         The routes

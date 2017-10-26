@@ -1,5 +1,6 @@
-/**
+/*!
  * Render a template into the DOM
+ * (c) 2017 Chris Ferdinandi, MIT License, https://gomakethings.com
  * @param  {String|Function} template The template to render
  * @param  {String|Node}     elem     The element to render into
  * @return {[type]}                   The element
