@@ -3,7 +3,7 @@
 
 	<head>
 		<meta charset="utf-8">
-		<title>Query Strings</title>
+		<title>getParams()</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 		<!-- Styles -->
@@ -16,15 +16,23 @@
 				margin-left: auto;
 				margin-right: auto;
 			}
+
+			/**
+			 * Form styles
+			 */
+
+			label,
+			input {
+				display: block;
+				width: 100%;
+			}
 		</style>
 	</head>
 
 	<body>
 
-		<h1>Hello, world.</h1>
+		<p><a href="?user=chris&view=photos">Click me first.</a> Then open up the console tab in dev tools.</p>
 
-
-		<!-- Scripts -->
 		<script>
 			/**
 			 * Get the URL parameters
@@ -35,18 +43,25 @@
 			var getParams = function (url) {
 				var params = {};
 				var parser = document.createElement('a');
-				parser.href = url;
+				parser.href = url || window.location.href;
 				var query = parser.search.substring(1);
 				var vars = query.split('&');
-				for (var i=0; i < vars.length; i++) {
-					var pair = vars[i].split("=");
-					params[pair[0]] = decodeURIComponent(pair[1]);
+				if (vars.length < 1) return params;
+				for (var i = 0; i < vars.length; i++) {
+					var pair = vars[i].split('=');
+					params[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]);
 				}
 				return params;
 			};
 
-			var params = getParams('my-awesome-app.com?p=settings&referer=https://twitter.com')
+			var params = getParams();
 			console.log(params);
+
+			if (params['user']) {
+				console.log('User page');
+			} else {
+				console.log('Homepage')
+			}
 		</script>
 	</body>
 </html>

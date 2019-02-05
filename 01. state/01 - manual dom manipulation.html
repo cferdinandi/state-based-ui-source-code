@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+		<title>Manual DOM Manipulation</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<!-- Styles -->
+		<style type="text/css">
+			body {
+				font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+				font-size: 112.5%;
+				max-width: 40em;
+				width: 88%;
+				margin-left: auto;
+				margin-right: auto;
+			}
+
+			/**
+			 * Form styles
+			 */
+
+			label,
+			input {
+				display: block;
+				width: 100%;
+			}
+		</style>
+	</head>
+
+	<body>
+
+		<h1>List Maker</h1>
+
+		<form id="add-to-list">
+			<label for="list-item">What do you want to add to your list?</label>
+			<input type="text" id="list-item">
+			<button>Add to your list</button>
+		</form>
+
+		<ul id="list"></ul>
+
+
+		<script>
+			document.addEventListener('submit', function (event) {
+
+				// Make sure our #add-to-list form was the one submitted
+				if (!event.target.matches('#add-to-list')) return;
+
+				// Prevent default
+				event.preventDefault();
+
+				// Get the list item
+				var item = event.target.querySelector('#list-item');
+				if (!item || item.length < 1) return;
+
+				// Add it to the DOM
+				var list = document.querySelector('#list');
+				var li = document.createElement('li');
+				li.textContent = item.value;
+				list.appendChild(li);
+
+				// Clear the input
+				item.value = '';
+				item.focus();
+
+			}, false);
+		</script>
+	</body>
+</html>

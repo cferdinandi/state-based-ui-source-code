@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+		<title>State-Based UI</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<!-- Styles -->
+		<style type="text/css">
+			body {
+				font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+				font-size: 112.5%;
+				max-width: 40em;
+				width: 88%;
+				margin-left: auto;
+				margin-right: auto;
+			}
+
+			/**
+			 * Form styles
+			 */
+
+			label,
+			input {
+				display: block;
+				width: 100%;
+			}
+		</style>
+	</head>
+
+	<body>
+
+		<h1>List Maker</h1>
+
+		<form id="add-to-list">
+			<label for="list-item">What do you want to add to your list?</label>
+			<input type="text" id="list-item">
+			<button>Add to your list</button>
+		</form>
+
+		<div id="list"></div>
+
+
+		<script>
+			// Data State
+			var data = {
+				listItems: []
+			};
+
+			// UI Template
+			var template = function () {
+
+				// If there are no list items
+				if (data.listItems.length < 1) return '<p><em>You do not have any list items yet. Try adding one with the form above.</em></p>';
+
+				// If there are
+				return '<ul>' + data.listItems.map(function (item) {
+					return '<li>' + item + '</li>';
+				}).join('') + '</ul>';
+
+			};
+
+			// Function to render the UI into the DOM
+			var render = function () {
+				var list = document.querySelector('#list');
+				if (!list) return;
+				list.innerHTML = template();
+			};
+
+			// Render the UI
+			render();
+
+			// Listen for form submissions
+			document.addEventListener('submit', function (event) {
+
+				// Make sure the submitted form was for our list items
+				if (!event.target.matches('#add-to-list')) return;
+
+				// Stop the form from submitting
+				event.preventDefault();
+
+				// Get the list item
+				var item = event.target.querySelector('#list-item');
+				if (!item || item.length < 1) return;
+
+				// Update the data and UI
+				data.listItems.push(item.value);
+				render();
+
+				// Clear the field and return to focus
+				item.value = '';
+				item.focus();
+
+			}, false);
+		</script>
+	</body>
+</html>

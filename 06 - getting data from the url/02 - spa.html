@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+		<title>Routing a Single-Page App</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<!-- Styles -->
+		<style type="text/css">
+			body {
+				font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+				font-size: 112.5%;
+				max-width: 40em;
+				width: 88%;
+				margin-left: auto;
+				margin-right: auto;
+			}
+
+			/**
+			 * Form styles
+			 */
+
+			label,
+			input {
+				display: block;
+				width: 100%;
+			}
+		</style>
+	</head>
+
+	<body>
+
+		<div id="app"></div>
+
+		<script src="component.js"></script>
+		<script>
+			/**
+			 * Get the URL parameters
+			 * source: https://css-tricks.com/snippets/javascript/get-url-variables/
+			 * @param  {String} url The URL
+			 * @return {Object}     The URL parameters
+			 */
+			var getParams = function (url) {
+				var params = {};
+				var parser = document.createElement('a');
+				parser.href = url || window.location.href;
+				var query = parser.search.substring(1);
+				var vars = query.split('&');
+				if (vars.length < 1) return params;
+				for (var i = 0; i < vars.length; i++) {
+					var pair = vars[i].split('=');
+					params[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]);
+				}
+				return params;
+			};
+
+			// Create a new list component
+			var lists = new Component('#app', {
+				data: {
+					listItems: []
+				},
+				template: function (props) {
+
+					var baseHTML =
+						'<p><a href="?page=settings">Settings &rarr;</a></p>' +
+						'<h1>List Maker</h1>' +
+
+						'<form id="add-to-list">' +
+							'<label for="list-item">What do you want to add to your list?</label>' +
+							'<input type="text" id="list-item" autofocus>' +
+							'<button>Add to your list</button>' +
+						'</form>' +
+
+						'<div id="list"></div>';
+
+					// If there are no list items
+					if (props.listItems.length < 1) return baseHTML + '<p><em>You do not have any list items yet. Try adding one with the form above.</em></p>';
+
+					// If there are
+					return baseHTML + '<ul>' + props.listItems.map(function (item) {
+						return '<li>' + item + '</li>';
+					}).join('') + '</ul>';
+
+				}
+			});
+
+			// Create a settings component
+			var settings = new Component('#app', {
+				template: function () {
+					var html =
+						'<p><a href="index.html">&larr; Back to Lists</a></p>' +
+						'<h1>Settings</h1>' +
+						'<p>A settings UI would go here.</p>';
+					return html;
+				}
+			});
+
+			var submitHandler = function (event) {
+
+				// Make sure the submitted form was for our list items
+				if (!event.target.matches('#add-to-list')) return;
+
+				// Stop the form from submitting
+				event.preventDefault();
+
+				// Get the list item
+				var item = event.target.querySelector('#list-item');
+				if (!item || item.length < 1) return;
+
+				// Reactively update the data
+				var items = lists.getData();
+				items.listItems.push(item.value);
+				lists.setData({listItems: items.listItems});
+
+				// Clear the field and return to focus
+				item = document.querySelector('#list-item');
+				if (!item) return;
+				item.focus();
+
+			};
+
+			// Determine the view/UI
+			var page = getParams();
+
+			if (page['page'] === 'settings') {
+				settings.render();
+			} else {
+
+				// Render the initial UI
+				lists.render();
+
+				// Listen for form submissions
+				document.addEventListener('submit', submitHandler, false);
+
+			}
+		</script>
+	</body>
+</html>

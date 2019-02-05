@@ -3,7 +3,7 @@
 
 	<head>
 		<meta charset="utf-8">
-		<title>Project Template</title>
+		<title>Who's Driving?</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 		<!-- Styles -->
@@ -17,21 +17,36 @@
 				margin-right: auto;
 			}
 
-			label {
+			/**
+			 * Form styles
+			 */
+
+			label,
+			input {
 				display: block;
-				font-weight: bold;
-				margin-bottom: 0.5em;
+				width: 100%;
 			}
 		</style>
 	</head>
 
 	<body>
 
-		<!-- The app container -->
+		<h1>Who's Driving?</h1>
+
 		<div id="app"></div>
 
+		<form id="add-driver">
+			<label for="driver-name">Add a name to the list of possible drivers</label>
+			<input type="text" id="driver-name">
+			<button>Add a Driver</button>
+		</form>
 
-		<!-- Scripts -->
+		<p>
+			<button id="pick-driver">Pick a Driver</button>
+			<button id="clear-drivers">Remove All Drivers</button>
+		</p>
+
+		<script src="component.js"></script>
 		<script>
 			// Code goes here...
 		</script>

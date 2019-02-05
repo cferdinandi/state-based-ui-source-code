@@ -3,7 +3,7 @@
 
 	<head>
 		<meta charset="utf-8">
-		<title>preventDefault()</title>
+		<title>Settings | Routing</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 		<!-- Styles -->
@@ -16,31 +16,24 @@
 				margin-left: auto;
 				margin-right: auto;
 			}
+
+			/**
+			 * Form styles
+			 */
+
+			label,
+			input {
+				display: block;
+				width: 100%;
+			}
 		</style>
 	</head>
 
 	<body>
 
-		<p>
-			<a href="/click-me">Click Me</a>
-		</p>
+		<div data-app="settings"></div>
 
-
-		<!-- Scripts -->
-		<script>
-			// Listen for all focus events in the document
-			document.addEventListener('click', function (event) {
-
-				// Only run on links
-				if (event.target.tagName.toLowerCase() !== 'a') return;
-
-				// Don't follow the link
-				event.preventDefault();
-
-				// Log a message in the console
-				console.log('The link did\'t work');
-
-			}, true);
-		</script>
+		<script src="component.js"></script>
+		<script src="app.js"></script>
 	</body>
 </html>
