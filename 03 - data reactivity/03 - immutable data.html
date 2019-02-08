@@ -86,6 +86,14 @@
 			// Render the UI
 			render();
 
+			// Set default values
+			setData({listItems: ['Dumbledore', 'Hermione', 'Gandalf', 'Neville']});
+
+			// Try to copy and push a new item
+			var items = getData();
+			items.listItems.push('Harry Potter');
+			console.log(data.listItems);
+
 			// Listen for form submissions
 			document.addEventListener('submit', function (event) {
 

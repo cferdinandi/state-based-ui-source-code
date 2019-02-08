@@ -13,9 +13,7 @@ var lists = new Component('[data-app="lists"]', {
 				'<label for="list-item">What do you want to add to your list?</label>' +
 				'<input type="text" id="list-item" autofocus>' +
 				'<button>Add to your list</button>' +
-			'</form>' +
-
-			'<div id="list"></div>';
+			'</form>';
 
 		// If there are no list items
 		if (props.listItems.length < 1) return baseHTML + '<p><em>You do not have any list items yet. Try adding one with the form above.</em></p>';
