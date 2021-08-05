@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+		<title>Manual DOM Manipulation</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<style type="text/css">
+			body {
+				margin: 0 auto;
+				max-width: 40em;
+				width: 88%;
+			}
+		</style>
+	</head>
+
+	<body>
+
+		<h1>Manual DOM Manipulation</h1>
+
+		<ul id="list">
+			<li>Gandalf</li>
+			<li>Radagast</li>
+			<li>Merlin</li>
+		</ul>
+
+
+		<script>
+			function addWizard (wizard) {
+
+				// If there's no wizard to do, do nothing
+				if (!wizard || wizard.length < 1) return;
+
+				// Get the list
+				let list = document.querySelector('#list');
+
+				// Create a new list item
+				let listItem = document.createElement('li');
+				listItem.textContent = wizard;
+
+				// Append the item to the list
+				list.append(listItem);
+
+			}
+
+			// Add Ursula to the list
+			// addWizard('Ursula');
+		</script>
+	</body>
+</html>

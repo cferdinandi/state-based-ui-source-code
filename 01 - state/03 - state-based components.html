@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+		<title>State-Based Components</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<style type="text/css">
+			body {
+				margin: 0 auto;
+				max-width: 40em;
+				width: 88%;
+			}
+		</style>
+	</head>
+
+	<body>
+
+		<h1>State-Based Components</h1>
+
+		<div id="app"></div>
+
+
+		<script>
+			let Rue = (function () {
+
+				/**
+				 * The Constructor object
+				 * @param {String} selector The selector for the element to render into
+				 * @param {Object} options  The component options
+				 */
+				function Constructor (selector, options) {
+					this.elem = document.querySelector(selector);
+					this.data = options.data;
+					this.template = options.template;
+				}
+
+				/**
+				 * Render the UI
+				 */
+				Constructor.prototype.render = function () {
+					this.elem.innerHTML = this.template(this.data);
+				};
+
+				return Constructor;
+
+			})();
+
+			// Create a wizards component
+			let app = new Rue('#app', {
+				data: {
+					wizards: ['Gandalf', 'Radagast', 'Merlin']
+				},
+				template: function (props) {
+
+					// If there are no wizards, show a message
+					if (!props.wizards.length) {
+						return `<p>There aren't any wizards yet.</p>`;
+					}
+
+					// Otherwise, show a list
+					return `
+						<ul>
+							${props.wizards.map(function (wizard) {
+								return `<li>${wizard}</li>`;
+							}).join('')}
+						</ul>`;
+
+				}
+			});
+
+			// Render the UI
+			app.render();
+
+
+			// Add a wizard
+			app.data.wizards.push('Ursula');
+			app.render();
+
+			// Remove all wizards
+			// app.data.wizards = [];
+			// app.render();
+		</script>
+	</body>
+</html>

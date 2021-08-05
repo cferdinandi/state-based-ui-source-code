@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+		<title>A Setter Function</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<style type="text/css">
+			body {
+				margin: 0 auto;
+				max-width: 40em;
+				width: 88%;
+			}
+		</style>
+	</head>
+
+	<body>
+
+		<h1>A Setter Function</h1>
+
+		<div id="app"></div>
+
+
+		<script>
+			let Rue = (function () {
+
+				/**
+				 * The Constructor object
+				 * @param {String} selector The selector for the element to render into
+				 * @param {Object} options  The component options
+				 */
+				function Constructor (selector, options) {
+					this.elem = document.querySelector(selector);
+					this.data = options.data;
+					this.template = options.template;
+				}
+
+				/**
+				 * Render the UI
+				 */
+				Constructor.prototype.render = function () {
+					this.elem.innerHTML = this.template(this.data);
+				};
+
+				/**
+				 * Update the component data and render a new UI
+				 * @param {Object} obj The new data
+				 */
+				Constructor.prototype.setData = function (obj = {}) {
+
+					// Add properties to the data
+					for (let key in obj) {
+						this.data[key] = obj[key];
+					}
+
+					// Render a fresh UI
+					this.render();
+
+				};
+
+				return Constructor;
+
+			})();
+
+			// Create a wizards component
+			let app = new Rue('#app', {
+				data: {
+					heading: 'Wizards',
+					wizards: ['Gandalf', 'Radagast', 'Merlin']
+				},
+				template: function (props) {
+
+					// If there are no wizards, show a message
+					if (!props.wizards.length) {
+						return `There aren't any wizards yet.`;
+					}
+
+					// Otherwise, show a list
+					return `
+						<h2>${props.heading}</h2>
+						<ul>
+							${props.wizards.map(function (wizard) {
+								return `<li>${wizard}</li>`;
+							}).join('')}
+						</ul>`;
+
+				}
+			});
+
+			// Render the UI
+			app.render();
+
+
+			// Reactively update the heading
+			app.setData({heading: 'Magical Folk'});
+
+
+			// Add a wizard
+			// This approach wipes out the array
+			// app.setData({wizards: app.data.wizards.push('Ursula')});
+
+			// The old approach works
+			/*app.data.wizards.push('Ursula');
+			app.render();*/
+
+			// Or you can create an immutable copy
+			let wizards = Array.from(app.data.wizards);
+			wizards.push('Ursula');
+			app.setData({wizards: wizards});
+		</script>
+	</body>
+</html>

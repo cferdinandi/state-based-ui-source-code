@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+		<title>Virtual DOM</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<style type="text/css">
+			body {
+				margin: 0 auto;
+				max-width: 40em;
+				width: 88%;
+			}
+		</style>
+	</head>
+
+	<body>
+
+		<h1>Wizards</h1>
+		<ul>
+			<li class="active">Gandalf</li>
+			<li data-spell="Turn into an animal">Radagast</li>
+			<li>Merlin</li>
+		</ul>
+
+
+		<script>
+			let dom = [
+				{
+					type: 'h1',
+					text: 'Wizards',
+					props: [],
+					children: null
+				},
+				{
+					type: 'ul',
+					text: null,
+					props: [],
+					children: [
+						{
+							type: 'li',
+							text: 'Gandalf',
+							props: [{
+									name: 'class',
+									value: 'active'
+							}],
+							children: null
+						},
+						{
+							type: 'li',
+							text: 'Radagast',
+							props: [{
+								name: 'data-spell',
+								value: 'Turn into an animal'
+							}],
+							children: null
+						},
+						{
+							type: 'li',
+							text: 'Merlin',
+							props: [],
+							children: null
+						}
+					]
+				}
+			];
+		</script>
+	</body>
+</html>

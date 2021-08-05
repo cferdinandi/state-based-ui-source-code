@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+		<title>State-Based UI</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<style type="text/css">
+			body {
+				margin: 0 auto;
+				max-width: 40em;
+				width: 88%;
+			}
+		</style>
+	</head>
+
+	<body>
+
+		<h1>State-Based UI</h1>
+
+		<div id="app"></div>
+
+
+		<script>
+			let data = {
+				wizards: ['Gandalf', 'Radagast', 'Merlin']
+			};
+
+			/**
+			 * Create an HTML string from the data
+			 * @param  {Object} props The data object
+			 * @return {String}       The HTML string
+			 */
+			function template (props) {
+
+				// If there are no wizards, show a message
+				if (!props.wizards.length) {
+					return `<p>There aren't any wizards yet.</p>`;
+				}
+
+				// Otherwise, show a list
+				return `
+					<ul>
+						${props.wizards.map(function (wizard) {
+							return `<li>${wizard}</li>`;
+						}).join('')}
+					</ul>`;
+
+			}
+
+			// Render the UI
+			let app = document.querySelector('#app');
+			app.innerHTML = template(data);
+
+
+			// If you want to make updates, push them into your data object, then render again
+			data.wizards.push('Ursula');
+			app.innerHTML = template(data);
+
+			// To remove a wizard, update the data and render again
+			data.wizards = data.wizards.slice(1);
+			app.innerHTML = template(data);
+
+			// You can also completely wipe out your list if you wanted to
+			data.wizards = [];
+			app.innerHTML = template(data);
+		</script>
+	</body>
+</html>

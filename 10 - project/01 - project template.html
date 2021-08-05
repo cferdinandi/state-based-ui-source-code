@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+		<title>Project Template</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<style type="text/css">
+			body {
+				margin: 0 auto;
+				max-width: 40em;
+				width: 88%;
+			}
+
+			label,
+			select {
+				display: block;
+				width: 100%;
+			}
+
+			.grid {
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				grid-template-rows: 1fr;
+				grid-column-gap: 1em;
+				grid-row-gap: 0;
+				margin-bottom: 1.5em;
+			}
+
+			img {
+				height: auto;
+				max-width: 100%;
+			}
+		</style>
+	</head>
+
+	<body>
+
+		<h1>Awesome Dogs</h1>
+
+		<div class="grid">
+			<div>
+				<label for="age">Age</label>
+				<select id="age" data-filter="age">
+					<option value="all">All Ages</option>
+					<option value="puppy">Puppy</option>
+					<option value="adult">Adult</option>
+					<option value="senior">Senior</option>
+				</select>
+			</div>
+
+			<div>
+				<label for="size">Size</label>
+				<select id="size" data-filter="size">
+					<option value="all">All Sizes</option>
+					<option value="small">Small</option>
+					<option value="medium">Medium</option>
+					<option value="large">Large</option>
+				</select>
+			</div>
+
+			<div>
+				<label for="cats">Likes Cats</label>
+				<select id="cats" data-filter="cats">
+					<option value="all">Doesn't Matter</option>
+					<option value="yes">Yes</option>
+					<option value="no">No</option>
+				</select>
+			</div>
+		</div>
+
+
+		<div id="app"></div>
+
+
+		<script src="rue.js"></script>
+		<script src="dogs.js"></script>
+		<script>
+			// Code goes here...
+		</script>
+	</body>
+</html>

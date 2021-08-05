@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+		<title>What is DOM diffing?</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<style type="text/css">
+			body {
+				margin: 0 auto;
+				max-width: 40em;
+				width: 88%;
+			}
+
+			.active {
+				background-color: #fbf9c9;
+			}
+		</style>
+	</head>
+
+	<body>
+
+		<!-- Original UI -->
+		<h1>Wizards</h1>
+		<ul>
+			<li class="active">Gandalf</li>
+			<li>Radagast</li>
+			<li>Merlin</li>
+		</ul>
+
+		<!-- Updated UI -->
+		<h1>Magical Folk</h1>
+		<ul>
+			<li>Gandalf</li>
+			<li>Radagast</li>
+			<li class="active">Merlin</li>
+			<li>Ursula</li>
+		</ul>
+
+		<!--
+
+			There are four things that need to change here.
+
+			1. The `h1` heading text needs to be updated.
+			2. The `.active` class needs to be removed from the `Gandalf` list item.
+			3. The `.active` class needs to be added to the `Merlin` list item.
+			4. A fourth list item with the text `Ursula` needs to be added to the end of the list.
+
+		 -->
+	</body>
+</html>

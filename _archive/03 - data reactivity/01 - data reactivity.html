@@ -68,14 +68,22 @@
 				list.innerHTML = template();
 			};
 
-			// Reactively update data
+			/**
+			 * Reactively update the data object
+			 * @param {Object} obj The updated data
+			 */
 			var setData = function (obj) {
+
+				// Update the data object
 				for (var key in obj) {
 					if (obj.hasOwnProperty(key)) {
 						data[key] = obj[key];
 					}
 				}
+
+				// Render a new UI
 				render();
+
 			};
 
 			// Render the UI

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+		<title>Proxies</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	</head>
+
+	<body>
+
+
+		<script>
+			// Our wizard data
+			let wizard = {
+				name: 'Merlin',
+				job: 'wizard',
+				spells: ['Light', 'Fire', 'Turn into animals']
+			};
+
+			// Create a proxy
+			let data = new Proxy(wizard, {
+				get: function (obj, prop) {
+					console.log('get');
+					console.log(obj, prop, obj[prop]);
+					return obj[prop];
+				},
+				set: function (obj, prop, value) {
+
+					// Update the property
+					obj[prop] = value;
+
+					console.log('set');
+					console.log(obj, prop, value);
+
+					// Indicate success
+					// This is required
+					return true;
+
+				},
+				deleteProperty: function (obj, prop) {
+
+					console.log('delete');
+					console.log(obj, prop, obj[prop]);
+
+					// Delete the property
+					delete obj[prop];
+
+					// Indicate success
+					// This is required
+					return true;
+
+				}
+			});
+
+			// Get data
+			let name = data.name;
+
+			// Set data
+			data.tool = 'wand';
+
+			// Delete data
+			delete data.job;
+
+			// Add an item to Merlin's spells
+			// This runs our get() method, but not the set() method
+			data.spells.push('Healing');
+		</script>
+	</body>
+</html>
