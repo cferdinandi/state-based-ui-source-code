@@ -3,7 +3,7 @@
 
 	<head>
 		<meta charset="utf-8">
-		<title>Converting a string to HTML</title>
+		<title>Nested Proxies</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 		<style type="text/css">
@@ -12,31 +12,18 @@
 				max-width: 40em;
 				width: 88%;
 			}
-
-			.active {
-				background-color: #fbf9c9;
-			}
 		</style>
 	</head>
 
 	<body>
+
+		<h1>Nested Proxies</h1>
 
 		<div id="app"></div>
 
 
 		<script>
 			let Rue = (function () {
-
-				/**
-				 * Convert a string into DOM nodes
-				 * @param  {String} str The HTML string
-				 * @return {Body}       The DOM nodes
-				 */
-				function stringToHTML (str) {
-					let parser = new DOMParser();
-					let doc = parser.parseFromString(str, 'text/html');
-					return doc.body;
-				}
 
 				/**
 				 * Debounce rendering for better performance
@@ -65,12 +52,8 @@
 					return {
 						get: function (obj, prop) {
 
-							// If the property is "isProxy", item is already being intercepted by this proxy handler
-							// return true
-							if (prop === '_isProxy') return true;
-
 							// If the item is an object or array, return a proxy
-							if (['[object Object]', '[object Array]'].includes(Object.prototype.toString.call(obj[prop])) && !obj[prop]._isProxy) {
+							if (['[object Object]', '[object Array]'].includes(Object.prototype.toString.call(obj[prop]))) {
 								return new Proxy(obj[prop], handler(instance));
 							}
 
@@ -123,40 +106,62 @@
 				 * Render the UI
 				 */
 				Constructor.prototype.render = function () {
-
-					// Convert a string to HTML
-					let template = stringToHTML(this.template(this.data));
-					console.log(template);
-
-					// Render the template string into the UI
+					console.log('rendered');
 					this.elem.innerHTML = this.template(this.data);
-
 				};
 
 				return Constructor;
 
 			})();
 
-			// Create the component
+			// Create a wizards and witches component
 			let app = new Rue('#app', {
 				data: {
-					heading: 'Wizards',
-					items: ['Gandalf', 'Radagast', 'Merlin'],
-					active: 'Gandalf'
+					wizards: {
+						list: ['Gandalf', 'Radagast', 'Merlin']
+					},
+					witches: {
+						list: ['Ursula', 'Wicked Witch Of The West', 'Malificent']
+					}
 				},
 				template: function (props) {
+
+					// If there are no wizards, show a message
+					if (!props.wizards.list.length || !props.witches.list.length) {
+						return `There aren't any wizards or witches yet.`;
+					}
+
+					// Otherwise, show a list
 					return `
-						<h1>${props.heading}</h1>
+						<h2>Wizards</h2>
 						<ul>
-							${props.items.map(function (item) {
-								return `<li ${item === props.active ? 'class="active"' : ''}>${item}</li>`;
+							${props.wizards.list.map(function (wizard) {
+								return `<li>${wizard}</li>`;
+							}).join('')}
+						</ul>
+
+						<h2>Witches</h2>
+						<ul>
+							${props.witches.list.map(function (witch) {
+								return `<li>${witch}</li>`;
 							}).join('')}
 						</ul>`;
+
 				}
 			});
 
 			// Render the UI
 			app.render();
+
+			/**
+			 * Reverse the witches and wizards
+			 */
+			function swapMagic () {
+				let tempCache = app.data.wizards.list;
+				app.data.wizards.list = app.data.witches.list;
+				app.data.witches.list = tempCache;
+				console.log(app.data.wizards.list, app.data.witches.list);
+			}
 		</script>
 	</body>
 </html>

@@ -176,8 +176,12 @@
 					return {
 						get: function (obj, prop) {
 
+							// If the property is "isProxy", item is already being intercepted by this proxy handler
+							// return true
+							if (prop === '_isProxy') return true;
+
 							// If the item is an object or array, return a proxy
-							if (['[object Object]', '[object Array]'].includes(Object.prototype.toString.call(obj[prop]))) {
+							if (['[object Object]', '[object Array]'].includes(Object.prototype.toString.call(obj[prop])) && !obj[prop]._isProxy) {
 								return new Proxy(obj[prop], handler(instance));
 							}
 
