@@ -3,7 +3,7 @@
 
 	<head>
 		<meta charset="utf-8">
-		<title>State-Based UI</title>
+		<title>Setter Functions</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 		<style type="text/css">
@@ -17,14 +17,18 @@
 
 	<body>
 
-		<h1>State-Based UI</h1>
+		<h1>Setter Functions</h1>
 
 		<div id="app"></div>
 
 
+		<script src="render.js"></script>
 		<script>
 			// The app data
 			let wizards = ['Gandalf', 'Radagast', 'Merlin'];
+
+			// Get the #app element
+			let app = document.querySelector('#app');
 
 			/**
 			 * Create an HTML string from the data
@@ -47,22 +51,30 @@
 
 			}
 
-			// Render the UI
-			let app = document.querySelector('#app');
-			app.innerHTML = template();
+			/**
+			 * Add a wizard to our data
+			 * @param {String} wizard The wizard
+			 */
+			function addWizard (wizard) {
+				wizards.push(wizard);
+				render(app, template());
+			}
 
+			/**
+			 * Remove a wizard
+			 * @param {Integer} index The index of the wizard to remove
+			 */
+			function removeWizard (index) {
+				wizards.splice(index, 1);
+				render(app, template());
+			}
 
-			// If you want to make updates, push them into your data object, then render again
-			// wizards.push('Ursula');
-			// app.innerHTML = template();
+			// Render the initial UI
+			render(app, template());
 
-			// To remove a wizard, update the data and render again
-			// wizards.splice(0, 1);
-			// app.innerHTML = template();
-
-			// You can also completely wipe out your list if you wanted to
-			// wizards = [];
-			// app.innerHTML = template();
+			// Reactively update the UI
+			// addWizard('Ursula');
+			// removeWizard(0);
 		</script>
 	</body>
 </html>

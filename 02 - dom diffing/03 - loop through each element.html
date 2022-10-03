@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+		<title>Loop through each element</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<style type="text/css">
+			body {
+				margin: 0 auto;
+				max-width: 40em;
+				width: 88%;
+			}
+
+			.active {
+				background-color: #fbf9c9;
+			}
+		</style>
+	</head>
+
+	<body>
+
+		<div id="app"></div>
+
+
+		<script>
+			// Get the #app element
+			let app = document.querySelector('#app');
+
+			// The app data
+			let wizards = ['Gandalf', 'Radagast', 'Merlin'];
+			let heading = 'Wizards';
+			let active = 'Gandalf';
+
+			/**
+			 * Create an HTML string from the data
+			 * @return {String} The HTML string
+			 */
+			function template () {
+
+				// If there are no wizards, show a message
+				if (!wizards.length) {
+					return `<p>There aren't any wizards yet.</p>`;
+				}
+
+				// Otherwise, show a list
+				return `
+					<h1>${heading}</h1>
+					<ul>
+						${wizards.map(function (wizard) {
+							return `<li ${wizard === active ? 'class="active"' : ''}>${wizard}</li>`;
+						}).join('')}
+					</ul>`;
+
+			}
+
+			/**
+			 * Convert a string into DOM nodes
+			 * @param  {String} str The HTML string
+			 * @return {Body}       The DOM nodes
+			 */
+			function stringToHTML (str) {
+				let parser = new DOMParser();
+				let doc = parser.parseFromString(str, 'text/html');
+				return doc.body;
+			}
+
+			/**
+			 * Compare the existing UI to the template and make updates
+			 * @param  {Node} template The template HTML
+			 * @param  {Node} dom      The existing DOM HTML
+			 */
+			function diff (template, dom) {
+
+				// console.log(template, dom);
+
+				// Get the nodes in the template and DOM
+				let templateNodes = template.childNodes;
+				let domNodes = dom.childNodes;
+
+				// console.log(templateNodes, domNodes);
+
+				// Loop through each template node
+				templateNodes.forEach(function (node, index) {
+
+					// Compare node type, text content, and attributes
+					// If the elements aren't the same, inject the template node before the existing one
+					// If the text or attributes are different, update them
+					// console.log('template node', node);
+					// console.log('existing node', domNodes[index]);
+
+					// If there are nodes within it, recursively diff those
+					if (node.childNodes && domNodes[index]) {
+						diff(node, domNodes[index]);
+					}
+
+				});
+
+				let extra = domNodes.length - templateNodes.length;
+				if (extra < 0) {
+					for (; extra > 0; extra--) {
+						// Remove the extra nodes
+						console.log('extra', domNodes[domNodes.length - 1]);
+					}
+				}
+
+			}
+
+			// Render the initial UI
+			app.innerHTML = template().trim();
+
+			// Update the app state
+			heading = 'The magical folk';
+			wizards.push('Ursula');
+			active = 'Merlin';
+
+			// Diff the DOM
+			let html = stringToHTML(template());
+			diff(html, app);
+		</script>
+	</body>
+</html>

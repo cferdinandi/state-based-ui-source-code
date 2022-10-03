@@ -3,7 +3,7 @@
 
 	<head>
 		<meta charset="utf-8">
-		<title>State-Based UI</title>
+		<title>What is reactivity?</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 		<style type="text/css">
@@ -17,14 +17,18 @@
 
 	<body>
 
-		<h1>State-Based UI</h1>
+		<h1>What is reactivity?</h1>
 
 		<div id="app"></div>
 
 
+		<script src="render.js"></script>
 		<script>
 			// The app data
 			let wizards = ['Gandalf', 'Radagast', 'Merlin'];
+
+			// Get the #app element
+			let app = document.querySelector('#app');
 
 			/**
 			 * Create an HTML string from the data
@@ -47,22 +51,9 @@
 
 			}
 
-			// Render the UI
-			let app = document.querySelector('#app');
-			app.innerHTML = template();
-
-
-			// If you want to make updates, push them into your data object, then render again
-			// wizards.push('Ursula');
-			// app.innerHTML = template();
-
-			// To remove a wizard, update the data and render again
-			// wizards.splice(0, 1);
-			// app.innerHTML = template();
-
-			// You can also completely wipe out your list if you wanted to
-			// wizards = [];
-			// app.innerHTML = template();
+			// With reactive data, these changes would automatically cause the UI to update
+			wizards.push('Ursula');
+			wizards.splice(0, 1);
 		</script>
 	</body>
 </html>

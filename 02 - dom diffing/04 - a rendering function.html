@@ -3,7 +3,7 @@
 
 	<head>
 		<meta charset="utf-8">
-		<title>State-Based UI</title>
+		<title>A rendering function</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 		<style type="text/css">
@@ -12,19 +12,27 @@
 				max-width: 40em;
 				width: 88%;
 			}
+
+			.active {
+				background-color: #fbf9c9;
+			}
 		</style>
 	</head>
 
 	<body>
 
-		<h1>State-Based UI</h1>
-
 		<div id="app"></div>
 
 
+		<script src="render.js"></script>
 		<script>
+			// Get the #app element
+			let app = document.querySelector('#app');
+
 			// The app data
 			let wizards = ['Gandalf', 'Radagast', 'Merlin'];
+			let heading = 'Wizards';
+			let active = 'Gandalf';
 
 			/**
 			 * Create an HTML string from the data
@@ -39,30 +47,30 @@
 
 				// Otherwise, show a list
 				return `
+					<h1>${heading}</h1>
 					<ul>
 						${wizards.map(function (wizard) {
-							return `<li>${wizard}</li>`;
+							return `<li ${wizard === active ? 'class="active"' : ''}>${wizard}</li>`;
 						}).join('')}
 					</ul>`;
 
 			}
 
-			// Render the UI
-			let app = document.querySelector('#app');
-			app.innerHTML = template();
+			// Render the initial UI
+			render(app, template());
 
+			// Wait 3 seconds
+			setTimeout(function () {
 
-			// If you want to make updates, push them into your data object, then render again
-			// wizards.push('Ursula');
-			// app.innerHTML = template();
+				// Update the app state
+				heading = 'The magical folk';
+				wizards.push('Ursula');
+				active = 'Merlin';
 
-			// To remove a wizard, update the data and render again
-			// wizards.splice(0, 1);
-			// app.innerHTML = template();
+				// Diff the DOM
+				render(app, template());
 
-			// You can also completely wipe out your list if you wanted to
-			// wizards = [];
-			// app.innerHTML = template();
+			}, 3000);
 		</script>
 	</body>
 </html>

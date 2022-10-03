@@ -3,7 +3,7 @@
 
 	<head>
 		<meta charset="utf-8">
-		<title>State-Based UI</title>
+		<title>Proxies & Reactivity</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 		<style type="text/css">
@@ -17,14 +17,18 @@
 
 	<body>
 
-		<h1>State-Based UI</h1>
-
 		<div id="app"></div>
 
 
+		<script src="render.js"></script>
+		<script src="store.js"></script>
 		<script>
-			// The app data
-			let wizards = ['Gandalf', 'Radagast', 'Merlin'];
+			// Get the #app element
+			let app = document.querySelector('#app');
+
+			// Create a reactive data store
+			let wizards = store(['Gandalf', 'Radagast', 'Merlin']);
+			let heading = store('Wizards');
 
 			/**
 			 * Create an HTML string from the data
@@ -39,6 +43,7 @@
 
 				// Otherwise, show a list
 				return `
+					<h1>${heading.value}</h1>
 					<ul>
 						${wizards.map(function (wizard) {
 							return `<li>${wizard}</li>`;
@@ -47,22 +52,24 @@
 
 			}
 
-			// Render the UI
-			let app = document.querySelector('#app');
-			app.innerHTML = template();
+			// Render the initial UI
+			render(app, template());
 
+			// Listen for data changes and render UI
+			document.addEventListener('store', function (event) {
+				console.log(event.detail);
+				render(app, template());
+			});
 
-			// If you want to make updates, push them into your data object, then render again
-			// wizards.push('Ursula');
-			// app.innerHTML = template();
+			// Wait 3 seconds
+			setTimeout(function () {
 
-			// To remove a wizard, update the data and render again
-			// wizards.splice(0, 1);
-			// app.innerHTML = template();
+				// Update some state
+				// It will reactively update the UI
+				wizards.push('Ursula');
+				heading.value = 'The magical folk';
 
-			// You can also completely wipe out your list if you wanted to
-			// wizards = [];
-			// app.innerHTML = template();
+			}, 3000);
 		</script>
 	</body>
 </html>

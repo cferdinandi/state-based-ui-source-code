@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+		<title>Creating proxies from proxies</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	</head>
+
+	<body>
+
+		<script>
+			/**
+			 * Create the handler object for proxies, recursively turning nested arrays and objects into proxies
+			 * @return {Objet} The handler object
+			 */
+			function handler () {
+				return {
+					get: function (obj, prop) {
+
+						// If the item is an object or array, return a proxy
+						if (['[object Object]', '[object Array]'].includes(Object.prototype.toString.call(obj[prop]))) {
+							return new Proxy(obj[prop], handler());
+						}
+
+						// Otherwise, return the property
+						return obj[prop];
+
+					},
+					set: function (obj, prop, value) {
+
+						// Update the property
+						obj[prop] = value;
+
+						// Indicate success
+						// This is required
+						return true;
+
+					},
+					deleteProperty: function (obj, prop) {
+
+						// Delete the property
+						delete obj[prop];
+
+						// Indicate success
+						// This is required
+						return true;
+
+					}
+				};
+			}
+
+			// Create a proxy
+			let data = new Proxy({
+				wizards: {
+					list: ['Gandalf', 'Radagast', 'Merlin']
+				},
+				witches: {
+					list: ['Ursula', 'Wicked Witch Of The West', 'Malificent']
+				}
+			}, handler());
+
+			/**
+			 * Reverse the witches and wizards
+			 */
+			function swapMagic (index) {
+				let tempCache = data.wizards.list;
+				data.wizards.list = data.witches.list;
+				data.witches.list = tempCache;
+				console.log(`swapped ${index + 1} times`);
+			}
+
+			// Run swapMagic() a few dozen times
+			// WARNING: this will slow down or crash your browser
+			function runSwap () {
+				for (let i = 0; i < 30; i++) {
+					swapMagic(i);
+				}
+			}
+		</script>
+	</body>
+</html>
