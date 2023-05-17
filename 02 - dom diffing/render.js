@@ -191,8 +191,8 @@ let render = (function () {
 		return (
 			(typeof node1.nodeType === 'number' && node1.nodeType !== node2.nodeType) ||
 			(typeof node1.tagName === 'string' && node1.tagName !== node2.tagName) ||
-			node1.getAttribute('id') !== node2.getAttribute('id') ||
-			node1.getAttribute('src') !== node2.getAttribute('src')
+			(typeof node1.id === 'string' && node1.id !== node2.id) ||
+			(typeof node1.src === 'string' && node1.src !== node2.src)
 		);
 	}
 
